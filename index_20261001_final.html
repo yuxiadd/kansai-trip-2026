@@ -267,8 +267,8 @@ const tabs=[...document.querySelectorAll('.day-tab[data-day]')];
 const overviewCards=[...document.querySelectorAll('.overview-card')];
 const bottomBtns=[...document.querySelectorAll('.bottom-section-btn')];
 const checklistPanel=document.getElementById('prep-checklist-panel');
-const STORAGE_DAY='kansai-trip-selected-day-v18';
-const STORAGE_SECTION='kansai-trip-selected-section-v18';
+const STORAGE_DAY='kansai-trip-selected-day-v19';
+const STORAGE_SECTION='kansai-trip-selected-section-v19';
 const TRIP_DATES={1:'2026-10-03',2:'2026-10-04',3:'2026-10-05',4:'2026-10-06',5:'2026-10-07',6:'2026-10-08',7:'2026-10-09',8:'2026-10-10'};
 let currentDay=localStorage.getItem(STORAGE_DAY)||'1';
 let currentSection=localStorage.getItem(STORAGE_SECTION)||'timeline';
@@ -278,10 +278,6 @@ function japanNowParts(){
   const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());
   const obj={}; parts.forEach(p=>obj[p.type]=p.value);
   return {date:`${obj.year}-${obj.month}-${obj.day}`,minutes:Number(obj.hour)*60+Number(obj.minute)};
-}
-    document.documentElement.scrollTop=0;
-    document.body.scrollTop=0;
-  }));
 }
 function hardTop(){
   try{window.scrollTo(0,0);}catch(e){}
