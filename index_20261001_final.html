@@ -5,7 +5,7 @@
 .overview-link{margin-top:10px;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.12);color:#fff;border-radius:10px;padding:7px 10px;font-weight:700;font-size:12px}
 .section-switcher{display:none!important}
 .bottom-nav{display:none!important}
-.bottom-section-nav{position:fixed;left:0;right:0;bottom:0;z-index:80;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));display:flex;justify-content:center}
+.bottom-section-nav{position:fixed;left:0;right:0;bottom:0;z-index:80;background:#fff;border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));display:flex;justify-content:center;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .bottom-section-inner{width:min(600px,100%);display:flex;gap:10px}
 .bottom-section-btn{flex:1;border:0;border-radius:16px;background:#e9eef5;color:#5b6677;padding:14px 8px;font-weight:800;font-size:17px;min-height:56px}
 .bottom-section-btn.active{background:var(--brand);color:#fff}
@@ -219,29 +219,26 @@ body.checklist-mode .day-panel.active{display:none!important}
 .bottom-section-btn{font-size:14px!important;min-height:50px!important;padding:8px 3px!important;border-radius:13px!important;white-space:nowrap}
 @media(max-width:390px){.bottom-section-btn{font-size:13px!important;letter-spacing:-.02em}.bottom-section-nav{padding-left:8px!important;padding-right:8px!important}}
 </style><style id="mobile-blank-fix">
-/* Mobile layout fix: prevent large blank area above page content */
-html,body{overflow-x:clip!important;overflow-y:auto!important}
-.app{overflow-x:clip!important}
+/* v18: mobile blank-space fix */
+html{scroll-behavior:auto!important}
+html,body{overflow-x:hidden!important;overflow-y:auto!important}
+body{position:static!important}
+.app{overflow:visible!important;min-height:0!important}
+[hidden]{display:none!important}
 
-/* Checklist is a standalone view: never keep daily hero/weather/route above it */
+/* Checklist is standalone. */
 body.checklist-mode .content-wrap{display:none!important}
 body.checklist-mode .prep-checklist-panel{display:block!important;margin:0 auto!important;padding:10px 14px 28px!important}
-
-/* In checklist mode hide every daily/overview element regardless of day-mode */
 body.checklist-mode .day-panel,
-body.checklist-mode .day-panel.active,
 body.checklist-mode .overview-grid,
 body.checklist-mode .intro-card{display:none!important}
 
 @media(max-width:699px){
-  /* Sticky header was causing blank-frame/layout issues on mobile browsers */
-  .topbar{position:relative!important;top:auto!important;overflow:visible!important}
-  .day-tabs{overflow-x:auto!important;overflow-y:hidden!important;contain:none!important}
-  .content-wrap{padding-top:10px!important;margin-top:0!important;min-height:0!important}
-  .day-panel,.section-block{min-height:0!important;margin-top:0!important}
-  .day-panel:not(.active){display:none!important}
-  body.day-mode:not(.checklist-mode) .day-panel.active{display:block!important}
-  .hero-card{margin-top:0!important}
+  .topbar{position:static!important;top:auto!important;transform:none!important;contain:none!important}
+  .day-tabs{overflow-x:auto!important;overflow-y:hidden!important;contain:none!important;transform:none!important}
+  .content-wrap{padding-top:10px!important;margin-top:0!important;min-height:0!important;transform:none!important;contain:none!important}
+  .day-panel,.section-block,.hero-card{min-height:0!important;margin-top:0!important;transform:none!important;contain:none!important}
+  .bottom-section-nav{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;transform:none!important}
 }
 </style></head><body><div class="app"><header class="topbar"><div class="title">2026 關西 8 日旅程</div><div class="day-tabs"><button class="day-tab overview-tab" id="show-overview-inline" type="button">總覽<span class="day-date">8 日總覽</span><span class="day-spots">全部行程</span></button>
 <button class="day-tab active" data-date="2026-10-03" data-day="1"><span class="today-tab-badge">今天</span>D1<span class="day-date">10/3 週六</span><span class="day-spots">神戶・摩耶山・慶典</span></button>
@@ -264,13 +261,14 @@ body.checklist-mode .intro-card{display:none!important}
 <button class="bottom-section-btn" data-section="restaurants">餐廳</button>
 <button class="bottom-section-btn" data-section="transport">交通</button>
 <button class="bottom-section-btn" data-section="checklist">準備清單</button></div></div><script>
+if('scrollRestoration' in history) history.scrollRestoration='manual';
 const panels=[...document.querySelectorAll('.day-panel')];
 const tabs=[...document.querySelectorAll('.day-tab[data-day]')];
 const overviewCards=[...document.querySelectorAll('.overview-card')];
 const bottomBtns=[...document.querySelectorAll('.bottom-section-btn')];
 const checklistPanel=document.getElementById('prep-checklist-panel');
-const STORAGE_DAY='kansai-trip-selected-day-v17';
-const STORAGE_SECTION='kansai-trip-selected-section-v17';
+const STORAGE_DAY='kansai-trip-selected-day-v18';
+const STORAGE_SECTION='kansai-trip-selected-section-v18';
 const TRIP_DATES={1:'2026-10-03',2:'2026-10-04',3:'2026-10-05',4:'2026-10-06',5:'2026-10-07',6:'2026-10-08',7:'2026-10-09',8:'2026-10-10'};
 let currentDay=localStorage.getItem(STORAGE_DAY)||'1';
 let currentSection=localStorage.getItem(STORAGE_SECTION)||'timeline';
@@ -281,61 +279,91 @@ function japanNowParts(){
   const obj={}; parts.forEach(p=>obj[p.type]=p.value);
   return {date:`${obj.year}-${obj.month}-${obj.day}`,minutes:Number(obj.hour)*60+Number(obj.minute)};
 }
-function safeTopReset(){
-  // Reset scroll before swapping large panels; avoids mobile Safari/Chrome blank frames.
-  try{window.scrollTo(0,0);}catch(e){}
-  document.documentElement.scrollTop=0;
-  document.body.scrollTop=0;
-}
-function settleTopReset(){
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    try{window.scrollTo(0,0);}catch(e){}
     document.documentElement.scrollTop=0;
     document.body.scrollTop=0;
   }));
 }
+function hardTop(){
+  try{window.scrollTo(0,0);}catch(e){}
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
+}
+function forcePaintTop(){
+  // Force layout after large DOM visibility changes, then pin viewport to top.
+  void document.documentElement.offsetHeight;
+  hardTop();
+  requestAnimationFrame(()=>{
+    void document.body.offsetHeight;
+    hardTop();
+    setTimeout(hardTop,30);
+  });
+}
+function setVisible(el,show,displayValue='block'){
+  if(!el) return;
+  el.hidden=!show;
+  el.style.display=show?displayValue:'none';
+}
+function syncView(){
+  const isChecklist=currentSection==='checklist';
+  const isOverview=document.body.classList.contains('overview-mode');
+  const mainContent=document.querySelector('.content-wrap');
+  const overviewGrid=document.querySelector('.overview-grid');
+
+  setVisible(mainContent,!isChecklist,'block');
+  setVisible(checklistPanel,isChecklist,'block');
+  setVisible(overviewGrid,!isChecklist && isOverview,'grid');
+
+  panels.forEach(panel=>{
+    const showPanel=!isChecklist && !isOverview && panel.dataset.day===currentDay;
+    setVisible(panel,showPanel,'block');
+    panel.classList.toggle('active',showPanel);
+
+    panel.querySelectorAll('.section-block').forEach(bl=>{
+      const showBlock=showPanel && bl.dataset.section===currentSection;
+      setVisible(bl,showBlock,'block');
+      bl.classList.toggle('active',showBlock);
+    });
+    panel.querySelectorAll('.switch-btn').forEach(b=>{
+      b.classList.toggle('active',!isChecklist && b.dataset.target===currentSection);
+    });
+  });
+
+  tabs.forEach(t=>t.classList.toggle('active',!isOverview && t.dataset.day===currentDay));
+  const overviewBtn=document.getElementById('show-overview-inline');
+  if(overviewBtn) overviewBtn.classList.toggle('active',isOverview);
+  bottomBtns.forEach(b=>b.classList.toggle('active',b.dataset.section===currentSection));
+}
 function activateSection(section,doScroll=false){
-  if(doScroll) safeTopReset();
+  if(doScroll) hardTop();
   currentSection=section;
   localStorage.setItem(STORAGE_SECTION,section);
   const isChecklist=section==='checklist';
   document.body.classList.toggle('checklist-mode',isChecklist);
-  const mainContent=document.querySelector('.content-wrap');
-  if(mainContent) mainContent.setAttribute('aria-hidden',isChecklist?'true':'false');
-  if(checklistPanel) checklistPanel.classList.toggle('active',isChecklist);
-  bottomBtns.forEach(b=>b.classList.toggle('active',b.dataset.section===section));
-  panels.forEach(panel=>{
-    panel.querySelectorAll('.section-block').forEach(bl=>bl.classList.toggle('active',!isChecklist && bl.dataset.section===section));
-    panel.querySelectorAll('.switch-btn').forEach(b=>b.classList.toggle('active',!isChecklist && b.dataset.target===section));
-  });
-  if(doScroll) settleTopReset();
+  if(!document.body.classList.contains('overview-mode')) document.body.classList.add('day-mode');
+  syncView();
+  if(doScroll) forcePaintTop();
 }
 function setDay(day,doScroll=true){
-  if(doScroll) safeTopReset();
+  if(doScroll) hardTop();
   currentDay=String(day);
   localStorage.setItem(STORAGE_DAY,currentDay);
   document.body.classList.add('day-mode');
   document.body.classList.remove('overview-mode');
-  panels.forEach(p=>p.classList.toggle('active',p.dataset.day===currentDay));
-  tabs.forEach(t=>t.classList.toggle('active',t.dataset.day===currentDay));
-  const overviewBtn=document.getElementById('show-overview-inline');
-  if(overviewBtn) overviewBtn.classList.remove('active');
-  activateSection(currentSection);
+  document.body.classList.toggle('checklist-mode',currentSection==='checklist');
+  syncView();
   updateTodayMode();
   loadWeather(currentDay);
-  if(doScroll) settleTopReset();
+  if(doScroll) forcePaintTop();
 }
 function showOverview(){
-  safeTopReset();
+  hardTop();
+  currentSection='timeline';
+  localStorage.setItem(STORAGE_SECTION,currentSection);
   document.body.classList.remove('checklist-mode');
   document.body.classList.remove('day-mode');
   document.body.classList.add('overview-mode');
-  document.body.classList.remove('checklist-mode');
-  if(checklistPanel) checklistPanel.classList.remove('active');
-  tabs.forEach(t=>t.classList.remove('active'));
-  const overviewBtn=document.getElementById('show-overview-inline');
-  if(overviewBtn) overviewBtn.classList.add('active');
-  settleTopReset();
+  syncView();
+  forcePaintTop();
 }
 function parseTimeRange(text){
   const m=String(text||'').match(/(\d{1,2}):(\d{2})\s*[–—-]\s*(\d{1,2}):(\d{2})/);
