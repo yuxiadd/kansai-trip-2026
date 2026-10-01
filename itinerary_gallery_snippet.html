@@ -1,0 +1,195 @@
+<!-- Kansai Trip 2026: 每日行程表圖片區塊（D1~D8 連動版） -->
+<!--
+使用方式：
+1. 先把 8 張圖片放到網站，例如 /images/day1-itinerary.png ~ /images/day8-itinerary.png
+2. 將下方 CSS 併入 <style>
+3. 將下方 HTML 放到主內容區下方（或你要的獨立區塊位置）
+4. 將下方 JS 併入既有 <script>，並在既有 setDay()/showOverview() 後呼叫 syncItineraryGallery(currentDay)
+-->
+
+<style>
+.itinerary-gallery-wrap{
+  max-width: 1100px;
+  margin: 18px auto 28px;
+  padding: 0 14px;
+}
+.itinerary-gallery-card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:20px;
+  box-shadow:0 8px 24px rgba(15,23,42,.06);
+  overflow:hidden;
+}
+.itinerary-gallery-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:16px 18px;
+  border-bottom:1px solid #eef2f7;
+  background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);
+}
+.itinerary-gallery-title{
+  font-size:1.05rem;
+  font-weight:800;
+  color:#123c74;
+}
+.itinerary-gallery-subtitle{
+  font-size:.92rem;
+  color:#5b6578;
+}
+.itinerary-gallery-stage{
+  padding:14px;
+}
+.itinerary-image-panel{display:none}
+.itinerary-image-panel.active{display:block}
+.itinerary-image-box{
+  display:block;
+  width:100%;
+  background:#f8fafc;
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid #edf2f7;
+}
+.itinerary-image-box img{
+  display:block;
+  width:100%;
+  height:auto;
+}
+.itinerary-thumbs{
+  display:grid;
+  grid-template-columns:repeat(8,minmax(74px,1fr));
+  gap:8px;
+  padding:0 14px 14px;
+}
+.itinerary-thumb{
+  border:1px solid #dbe5f0;
+  background:#fff;
+  color:#2c3e57;
+  border-radius:12px;
+  padding:8px 6px;
+  font-size:.85rem;
+  font-weight:700;
+  cursor:pointer;
+}
+.itinerary-thumb.active{
+  background:#123c74;
+  color:#fff;
+  border-color:#123c74;
+}
+@media (max-width:699px){
+  .itinerary-gallery-wrap{padding:0 10px}
+  .itinerary-gallery-head{padding:14px}
+  .itinerary-gallery-stage{padding:10px}
+  .itinerary-thumbs{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    padding:0 10px 10px;
+  }
+}
+</style>
+
+<section class="itinerary-gallery-wrap" id="itinerary-gallery-wrap">
+  <div class="itinerary-gallery-card">
+    <div class="itinerary-gallery-head">
+      <div>
+        <div class="itinerary-gallery-title">每日行程表</div>
+        <div class="itinerary-gallery-subtitle" id="itinerary-gallery-subtitle">點選 D1～D8 或上方日期，即可切換對應的當日行程圖</div>
+      </div>
+    </div>
+
+    <div class="itinerary-gallery-stage" id="itinerary-gallery-stage">
+      <div class="itinerary-image-panel active" data-itinerary-day="1">
+        <a class="itinerary-image-box" href="/images/day1-itinerary.png" target="_blank">
+          <img src="/images/day1-itinerary.png" alt="DAY 1 神戶三宮・摩耶山 行程表">
+        </a>
+      </div>
+      <div class="itinerary-image-panel" data-itinerary-day="2">
+        <a class="itinerary-image-box" href="/images/day2-itinerary.png" target="_blank">
+          <img src="/images/day2-itinerary.png" alt="DAY 2 姬路城・京都入住 行程表">
+        </a>
+      </div>
+      <div class="itinerary-image-panel" data-itinerary-day="3">
+        <a class="itinerary-image-box" href="/images/day3-itinerary.png" target="_blank">
+          <img src="/images/day3-itinerary.png" alt="DAY 3 金閣寺・龜岡小火車・嵐山 行程表">
+        </a>
+      </div>
+      <div class="itinerary-image-panel" data-itinerary-day="4">
+        <a class="itinerary-image-box" href="/images/day4-itinerary.png" target="_blank">
+          <img src="/images/day4-itinerary.png" alt="DAY 4 宇治・奈良 行程表">
+        </a>
+      </div>
+      <div class="itinerary-image-panel" data-itinerary-day="5">
+        <a class="itinerary-image-box" href="/images/day5-itinerary.png" target="_blank">
+          <img src="/images/day5-itinerary.png" alt="DAY 5 清水寺・伏見稻荷・大阪入住 行程表">
+        </a>
+      </div>
+      <div class="itinerary-image-panel" data-itinerary-day="6">
+        <a class="itinerary-image-box" href="/images/day6-itinerary.png" target="_blank">
+          <img src="/images/day6-itinerary.png" alt="DAY 6 天橋立・阿倍野 行程表">
+        </a>
+      </div>
+      <div class="itinerary-image-panel" data-itinerary-day="7">
+        <a class="itinerary-image-box" href="/images/day7-itinerary.png" target="_blank">
+          <img src="/images/day7-itinerary.png" alt="DAY 7 大阪自由購物日 行程表">
+        </a>
+      </div>
+      <div class="itinerary-image-panel" data-itinerary-day="8">
+        <a class="itinerary-image-box" href="/images/day8-itinerary.png" target="_blank">
+          <img src="/images/day8-itinerary.png" alt="DAY 8 回程日 行程表">
+        </a>
+      </div>
+    </div>
+
+    <div class="itinerary-thumbs" id="itinerary-thumbs">
+      <button class="itinerary-thumb active" data-go-day="1">D1</button>
+      <button class="itinerary-thumb" data-go-day="2">D2</button>
+      <button class="itinerary-thumb" data-go-day="3">D3</button>
+      <button class="itinerary-thumb" data-go-day="4">D4</button>
+      <button class="itinerary-thumb" data-go-day="5">D5</button>
+      <button class="itinerary-thumb" data-go-day="6">D6</button>
+      <button class="itinerary-thumb" data-go-day="7">D7</button>
+      <button class="itinerary-thumb" data-go-day="8">D8</button>
+    </div>
+  </div>
+</section>
+
+<script>
+const itineraryTitles={
+  1:'DAY 1｜神戶三宮・摩耶山',
+  2:'DAY 2｜姬路城・京都入住',
+  3:'DAY 3｜金閣寺・龜岡小火車・嵐山',
+  4:'DAY 4｜宇治・奈良',
+  5:'DAY 5｜清水寺・伏見稻荷・大阪入住',
+  6:'DAY 6｜天橋立・阿倍野',
+  7:'DAY 7｜大阪自由購物日',
+  8:'DAY 8｜回程日'
+};
+
+function syncItineraryGallery(day){
+  const d=String(day);
+  document.querySelectorAll('.itinerary-image-panel').forEach(el=>{
+    el.classList.toggle('active',el.dataset.itineraryDay===d);
+  });
+  document.querySelectorAll('.itinerary-thumb').forEach(btn=>{
+    btn.classList.toggle('active',btn.dataset.goDay===d);
+  });
+  const subtitle=document.getElementById('itinerary-gallery-subtitle');
+  if(subtitle && itineraryTitles[d]) subtitle.textContent=itineraryTitles[d];
+}
+
+document.querySelectorAll('.itinerary-thumb').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const d=btn.dataset.goDay;
+    if(typeof setDay==='function'){
+      setDay(d,true);       // 與上方 D1~D8 主切換同步
+    }else{
+      syncItineraryGallery(d);
+    }
+  });
+});
+
+/* 若你現有程式最後有 setDay(currentDay,false) 或 showOverview()，
+   請在其後面補一行：syncItineraryGallery(currentDay)
+   並在既有的 setDay(day, doScroll=true) 函式最後加：syncItineraryGallery(currentDay);
+*/
+</script>
