@@ -230,6 +230,11 @@ body{position:static!important}
 /* Checklist is standalone. */
 body.checklist-mode .content-wrap{display:none!important}
 body.checklist-mode .prep-checklist-panel{display:block!important;margin:0 auto!important;padding:10px 14px 28px!important}
+/* v21: mobile checklist bottom reach fix — keep reset button above fixed nav + iPhone safe area */
+@media(max-width:699px){
+  body.checklist-mode .prep-checklist-panel{padding-bottom:calc(132px + env(safe-area-inset-bottom))!important}
+  body.checklist-mode .prep-reset-btn{scroll-margin-bottom:132px}
+}
 body.checklist-mode .day-panel,
 body.checklist-mode .overview-grid,
 body.checklist-mode .intro-card{display:none!important}
