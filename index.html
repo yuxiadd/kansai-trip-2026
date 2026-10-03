@@ -321,6 +321,8 @@ body.checklist-mode .intro-card{display:none!important}
 .poster-date{display:inline-block;border-left:3px solid #f2b665;padding-left:12px;font-weight:700}
 .poster-scenery{position:relative;aspect-ratio:5.5;overflow:hidden;background:#e6f4fc}
 .poster-scenery img{position:absolute;width:100%;max-width:none;height:auto;top:-96%;left:0}
+.poster-scenery.generated-route-scene{display:flex;align-items:center;justify-content:center;padding:12px 20px;background:linear-gradient(120deg,#e6f4fc,#f8fbff 48%,#fff1dc);border-top:1px solid #edf4f8;border-bottom:1px solid #e5edf3}
+.generated-route-scene .scene-route{font-size:22px;font-weight:900;letter-spacing:.03em;color:#174b73;text-align:center;white-space:nowrap}
 .poster-route{padding:17px 24px;background:#fff8e9;font-size:16px;line-height:1.8;border-bottom:1px solid #f2e5cf}
 .poster-section-label{margin:23px 24px 10px;font-size:20px;font-weight:900;color:#076b9c}
 .poster-stops{list-style:none;margin:0;padding:0 24px 8px;counter-reset:stops}
@@ -447,7 +449,13 @@ function syncItineraryPoster(){
   const header=document.createElement('header');header.className='poster-heading';
   header.append(posterText('div','KANSAI JOURNEY / DAY '+day,'poster-eyebrow'),posterText('h3',title),posterText('div','2026 / '+date,'poster-date'));
   const scenery=document.createElement('div');scenery.className='poster-scenery';scenery.setAttribute('aria-hidden','true');
-  const scenicImage=document.createElement('img');scenicImage.src='day'+day+'-itinerary.png';scenicImage.alt='';scenicImage.decoding='async';scenery.append(scenicImage);
+  const updatedScene={4:'宇治 → 伏見稻荷',5:'清水寺 → 奈良 → 大阪'};
+  if(updatedScene[day]){
+    scenery.classList.add('generated-route-scene');
+    scenery.append(posterText('div',updatedScene[day],'scene-route'));
+  }else{
+    const scenicImage=document.createElement('img');scenicImage.src='day'+day+'-itinerary.png';scenicImage.alt='';scenicImage.decoding='async';scenery.append(scenicImage);
+  }
   poster.append(header,scenery,posterText('div',panel.querySelector('.highlight-line').textContent,'poster-route'),posterText('div','行程時間軸','poster-section-label'));
   const list=document.createElement('ol');list.className='poster-stops';
   panel.querySelectorAll('[data-section="timeline"] .item-card').forEach(card=>{
